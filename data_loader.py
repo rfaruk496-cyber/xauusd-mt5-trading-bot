@@ -2,45 +2,37 @@ import pandas as pd
 
 
 def load_data(filename):
-    """
-    Load historical XAUUSD candle data from CSV.
-    """
+    """Load XAUUSD M5 historical data."""
 
     df = pd.read_csv(filename)
 
-    print("Columns found:")
-    print(df.columns.tolist())
+    # Convert column names to lowercase
+    df.columns = df.columns.str.strip().str.lower()
 
-    # Clean column names
-    df.columns = (
-        df.columns
-        .str.strip()
-        .str.lower()
-        .str.replace(" ", "_")
-    )
+    # Convert datetime
+    df["datetime"] = pd.to_datetime(df["datetime"])
 
-    required_columns = [
-        "time",
-        "open",
-        "high",
-        "low",
-        "close"
-    ]
+    # Sort oldest to newest
+    df = df.sort_values("datetime")
 
-    for column in required_columns:
-        if column not in df.columns:
-            raise ValueError(
-                f"Missing required column: {column}"
-            )
+    # Remove duplicate candles
+    df = df.drop_duplicates(subset="datetime")
 
-    df["time"] = pd.to_datetime(df["time"])
-
-    df = df.sort_values("time")
-    df = df.drop_duplicates(subset="time")
+    # Reset row numbers
     df = df.reset_index(drop=True)
 
     return df
 
 
 if __name__ == "__main__":
-    print("XAUUSD data loader ready.")
+    file = "data/XAUUSD_5m.csv"
+
+    data = load_data(file)
+
+    print("XAUUSD M5 data loaded successfully!")
+    print("Number of candles:", len(data))
+    print("\nFirst 5 candles:")
+    print(data.head())
+
+    print("\nLast 5 candles:")
+    print(data.tail())
