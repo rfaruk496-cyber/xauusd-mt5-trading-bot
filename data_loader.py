@@ -25,7 +25,7 @@ def load_data(filename):
 
 
 if __name__ == "__main__":
-    file = "data/XAUUSD_5m.csv"
+    file = "XAUUSD_5m.csv"
 
     data = load_data(file)
 
